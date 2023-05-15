@@ -8,9 +8,7 @@ from airflow.operators.dummy import DummyOperator
 import creds
 
 
-# task for downloading data from kaggle
-
-# task  for cleaning CR7 data
+# task for cleaning CR7 data
 def clean_cr7():
     read_path = '/mnt/c/Users/PC/Downloads/datamodel/'
     file = 'cr7.csv'
@@ -26,7 +24,7 @@ def clean_cr7():
     CR7['Minute'].replace(['90+5', '45+1', '90+3', '90+2', '90+1', '90+4', '90+6', '90+7', '45+7', '45+2'],
                           ['95', '46', '93', '92', '91', '94', '96', '97', '52', '47'], inplace=True)
 
-    # storing the cleaned data into a new file and folder
+    # storing the cleaned data into a new file
     output_path = '/mnt/c/Users/PC/Downloads/datamodel/cleaned_data/'
     CR7.to_csv(output_path + file, index=False)
 
@@ -45,12 +43,12 @@ def clean_messi():
                             ['91', '92', '93', '47', '46', '94', '49'],
                             inplace=True)
 
-    # storing the new cleaned data into a new file and folder
+    # storing the new cleaned data into a new file 
     output_path = '/mnt/c/Users/PC/Downloads/datamodel/cleaned_data/'
     messi.to_csv(output_path + file, index=False)
 
 
-# Creating the database in postgres
+# Creating the database
 def create_database_tables_insert_values():
     import psycopg2
     # connect to default database
@@ -58,18 +56,16 @@ def create_database_tables_insert_values():
     conn.set_session(autocommit=True)
     cur = conn.cursor()
 
-    # create sparfly database with UTFB encoding
     cur.execute('DROP DATABASE IF EXISTS ronaldomessi')
     cur.execute('CREATE DATABASE ronaldomessi')
 
-    # close connection
+
     conn.close()
 
-    # connect to sparkfly database
+
     conn = psycopg2.connect("host=localhost dbname=ronaldomessi user=postgres password=" + creds.postgres_pass)
     cur = conn.cursor()
-    # print(f'connection is {conn} and cursor is {cur}')
-    # return conn, conn.cursor()
+
     ronaldo_data_table_create = ("""CREATE TABLE IF NOT EXISTS ronaldo(
                                Season VARCHAR ,
                                Competition VARCHAR,
@@ -153,12 +149,12 @@ def create_database_tables_insert_values():
     conn.commit()
 
 
-# Let us go to the creation of our DAG now
+#create DAG 
 default_dag_args = {
-    'start_date': datetime(2023, 3, 10),  # When do you want this DAG to run for the 1st time
-    'email_on_failure': False,  # Do you want to send an email on failure
-    'email_on_retry': False,  # Befor failing it might retry a bunch of times
-    'retries': 1,  # How many retries do you want
+    'start_date': datetime(2023, 3, 10),  
+    'email_on_failure': False,  
+    'email_on_retry': False,  
+    'retries': 1,  
     'retry_delay': timedelta(minutes=5),  # delay before doing another retry
     'project_id': 1
 }
